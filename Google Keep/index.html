@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Google Keep Clone</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 600px; margin: 40px auto; padding: 0 16px; }
+    input, textarea { width: 100%; margin-bottom: 10px; padding: 8px; box-sizing: border-box; }
+    button { padding: 8px 16px; background: #fbbc04; border: none; font-weight: bold; cursor: pointer; }
+    .note { border: 1px solid #ddd; border-radius: 8px; padding: 12px; margin-top: 12px; }
+  </style>
+</head>
+<body>
+  <h2>My Keep Notes</h2>
+  <input id="note-title" placeholder="Title">
+  <textarea id="note-text" placeholder="Take a note..."></textarea>
+  <button id="add-btn">Add Note</button>
+  <div id="notes-list"></div>
+
+  <script>
+    let notes = JSON.parse(localStorage.getItem('keepNotes')) || [];
+
+    function renderNotes() {
+      const list = document.getElementById('notes-list');
+      list.innerHTML = notes.map(n => `<div class="note"><strong>${n.title}</strong><p>${n.text}</p></div>`).join('');
+    }
+
+    document.getElementById('add-btn').addEventListener('click', async () => {
+      const title = document.getElementById('note-title').value;
+      const text = document.getElementById('note-text').value;
+      if (!title && !text) return;
+
+      const newNote = { title, text };
+      notes.push(newNote);
+      localStorage.setItem('keepNotes', JSON.stringify(notes));
+      renderNotes();
+
+      await fetch('http://localhost:3000/api/notes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newNote)
+      });
+    });
+
+    renderNotes();
+  </script>
+</body>
+</html>

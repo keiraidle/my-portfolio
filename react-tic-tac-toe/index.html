@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tic Tac Toe</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      background: #111827;
+      color: #f9fafb;
+    }
+    h1 { margin-bottom: 8px; }
+    #status { margin-bottom: 18px; font-size: 18px; font-weight: bold; }
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 95px);
+      grid-template-rows: repeat(3, 95px);
+      gap: 8px;
+    }
+    .cell {
+      background: #1f2937;
+      border: 2px solid #374151;
+      border-radius: 8px;
+      font-size: 36px;
+      font-weight: bold;
+      color: #f9fafb;
+      cursor: pointer;
+    }
+    .cell:hover { background: #374151; }
+    button#reset {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 15px;
+      border: none;
+      border-radius: 6px;
+      background: #2563eb;
+      color: white;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Tic Tac Toe</h1>
+  <div id="status">Next player: X</div>
+  <div class="board" id="board"></div>
+  <button id="reset">Reset Game</button>
+
+  <script>
+    const boardEl = document.getElementById("board");
+    const statusEl = document.getElementById("status");
+    const resetBtn = document.getElementById("reset");
+
+    let cells = Array(9).fill(null);
+    let xIsNext = true;
+
+    const lines = [
+      [0, 1, 2], [3, 4, 5], [6, 7, 8],
+      [0, 3, 6], [1, 4, 7], [2, 5, 8],
+      [0, 4, 8], [2, 4, 6]
+    ];
+
+    function checkWinner(board) {
+      for (const [a, b, c] of lines) {
+        if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+          return board[a];
+        }
+      }
+      return board.every(Boolean) ? "Draw" : null;
+    }
+
+    function render() {
+      boardEl.innerHTML = "";
+      cells.forEach((val, idx) => {
+        const btn = document.createElement("button");
+        btn.className = "cell";
+        btn.textContent = val || "";
+        btn.addEventListener("click", () => handleClick(idx));
+        boardEl.appendChild(btn);
+      });
+
+      const winner = checkWinner(cells);
+      if (winner === "Draw") {
+        statusEl.textContent = "Game over: Draw!";
+      } else if (winner) {
+        statusEl.textContent = `Winner: ${winner}!`;
+      } else {
+        statusEl.textContent = `Next player: ${xIsNext ? "X" : "O"}`;
+      }
+    }
+
+    function handleClick(idx) {
+      if (cells[idx] || checkWinner(cells)) return;
+      cells[idx] = xIsNext ? "X" : "O";
+      xIsNext = !xIsNext;
+      render();
+    }
+
+    resetBtn.addEventListener("click", () => {
+      cells = Array(9).fill(null);
+      xIsNext = true;
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>
